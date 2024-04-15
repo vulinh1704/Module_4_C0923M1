@@ -13,6 +13,7 @@
 </head>
 <body>
 <a href="/students/add">Add Student</a>
+
 <form action="/students/search" method="get">
     <input type="text" name="nameSearch" placeholder="Enter name">
     <button>Search</button>
