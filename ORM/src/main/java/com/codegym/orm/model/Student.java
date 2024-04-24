@@ -17,6 +17,12 @@ public class Student {
     public Student() {
     }
 
+    public Student(String name, int age, double score) {
+        this.name = name;
+        this.age = age;
+        this.score = score;
+    }
+
     public Student(Long id, String name, int age, double score) {
         this.id = id;
         this.name = name;
