@@ -1,6 +1,7 @@
 package com.codegym.orm.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 
 @Entity
 public class ClassRoom {

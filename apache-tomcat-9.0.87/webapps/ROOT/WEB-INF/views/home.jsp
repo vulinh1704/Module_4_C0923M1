@@ -13,7 +13,7 @@
 </head>
 <body>
 <c:forEach items="${list}" var="item">
-    <h2>Id: ${item.id} - Name: ${item.name}</h2>
+    <h2>Id: ${item.id} - Name: ${item.name} - Class: ${item.classRoom.name}</h2>
 </c:forEach>
 </body>
 </html>
