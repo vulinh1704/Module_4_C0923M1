@@ -6,6 +6,7 @@ import com.codegym.orm.service.IClassRoomService;
 import com.codegym.orm.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +44,9 @@ public class StudentController {
     }
 
     @PostMapping("/add")
-    public String add(@ModelAttribute @Validated Student student, BindingResult bindingResult) {
+    public String add(@ModelAttribute @Validated Student student, BindingResult bindingResult, Model model) {
         if(bindingResult.hasFieldErrors()) {
+            model.addAttribute("errors", bindingResult.getAllErrors());
             return "add";
         }
         studentService.save(student);

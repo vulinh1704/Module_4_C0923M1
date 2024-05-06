@@ -13,11 +13,14 @@
     <title>Title</title>
 </head>
 <body>
+<c:forEach items="${errors}" var="error">
+    <p>${error.key}: ${error.value}</p>
+</c:forEach>
 <form action="/students/add" method="post">
     <input type="text" name="name" placeholder="Name">
-    <c:if test="${not empty errors['name']}">
-        <span>Lỗi ${errors['name']}</span>
-    </c:if>
+<%--    <c:if test="${not empty errors.fieldError('name')}">--%>
+<%--        <span>Lỗi ${errors.fieldError('name').defaultMessage}</span>--%>
+<%--    </c:if>--%>
     <input type="number" name="age" placeholder="Age">
     <input type="number" name="score" placeholder="Score">
     <input type="text" name="email" placeholder="Email">
