@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<button onclick="showHome()">Home</button> | <button onclick="showFormAdd()">Add</button>
+<div id="root">
+
+
+
+</div>
+
+<script>
+    showHome();
+    function showHome() {
+        axios.get("http://localhost:8080/students").then((response) => {
+            let list = response.data;
+            let html = `
+            <table border="1">
+                <tr>
+                    <td>Id</td>
+                    <td>Name</td>
+                    <td>Age</td>
+                    <td>Score</td>
+                    <td>Email</td>
+                    <td>Class</td>
+                    <td colspan="2">Action</td>
+                </tr>
+            `;
+            for (let i = 0; i < list.length; i++) {
+                html += `
+                <tr>
+                    <td>${list[i].id}</td>
+                    <td>${list[i].name}</td>
+                    <td>${list[i].age}</td>
+                    <td>${list[i].score}</td>
+                    <td>${list[i].email}</td>
+                    <td>${list[i].classRoom.name}</td>
+                    <td>Edit</td>
+                    <td><button onclick="remove(${list[i].id})">Delete</button></td>
+                </tr>
+                `
+            }
+            html += `</table>`;
+           document.getElementById("root").innerHTML = html;
+        });
+    }
+
+    function remove(id) {
+        let isConfirm = confirm("Are you sure ?");
+        if(isConfirm) {
+            axios.delete(`http://localhost:8080/students/${id}`).then(() => {
+                showHome();
+            })
+        }
+    }
+
+    function showFormAdd() {
+        axios.get('http://localhost:8080/classRooms').then((response) => {
+            let classRoom = response.data;
+            let html = `<select id="class">`;
+            for (let i = 0; i < classRoom.length; i++) {
+                html += `<option value="${classRoom[i].id}">${classRoom[i].name}</option>`
+            }
+            html += ` </select>`
+            document.getElementById("root").innerHTML = `
+            <input type="text" id="name" placeholder="Name">
+            <input type="number" id="age" placeholder="Age">
+            <input type="email" id="email" placeholder="Email">
+            <input type="text" id="score" placeholder="Score">
+            ${html}
+            <button onclick="add()">Submit</button>
+        `
+        })
+    }
+
+    function add() {
+        let name = document.getElementById("name").value;
+        let age = document.getElementById("age").value;
+        let email = document.getElementById("email").value;
+        let score = document.getElementById("score").value;
+        let idClass = document.getElementById("class").value;
+
+        let newStudent = {
+            name: name,
+            age: age,
+            score: score,
+            email: email,
+            classRoom: {
+                id: idClass
+            }
+        }
+        axios.post('http://localhost:8080/students', newStudent).then(() => {
+            showHome();
+        })
+    }
+</script>
+</body>
+</html>
