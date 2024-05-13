@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+            integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-<button onclick="showHome()">Home</button> | <button onclick="showFormAdd()">Add</button>
+<button onclick="showHome()">Home</button>
+|
+<button onclick="showFormAdd()">Add</button>
 <div id="root">
-
-
-
 </div>
 
 <script>
     showHome();
+
     function showHome() {
         axios.get("http://localhost:8080/students").then((response) => {
             let list = response.data;
@@ -27,6 +29,7 @@
                     <td>Score</td>
                     <td>Email</td>
                     <td>Class</td>
+                    <td>Subject</td>
                     <td colspan="2">Action</td>
                 </tr>
             `;
@@ -39,19 +42,24 @@
                     <td>${list[i].score}</td>
                     <td>${list[i].email}</td>
                     <td>${list[i].classRoom.name}</td>
-                    <td>Edit</td>
+                    <td>`
+                for (let j = 0; j < list[i].subjects.length; j++) {
+                    html += `${list[i].subjects[j].name}, `
+                }
+
+                html += `</td><td>Edit</td>
                     <td><button onclick="remove(${list[i].id})">Delete</button></td>
                 </tr>
                 `
             }
             html += `</table>`;
-           document.getElementById("root").innerHTML = html;
+            document.getElementById("root").innerHTML = html;
         });
     }
 
     function remove(id) {
         let isConfirm = confirm("Are you sure ?");
-        if(isConfirm) {
+        if (isConfirm) {
             axios.delete(`http://localhost:8080/students/${id}`).then(() => {
                 showHome();
             })
@@ -72,12 +80,32 @@
             <input type="email" id="email" placeholder="Email">
             <input type="text" id="score" placeholder="Score">
             ${html}
+            <div id="list-subject"></div>
             <button onclick="add()">Submit</button>
         `
+            axios.get("http://localhost:8080/subjects").then((response) => {
+                let listSubject = response.data;
+                let htmlSubject = ``;
+                for (let i = 0; i < listSubject.length; i++) {
+                    htmlSubject += `<input type="checkbox" name="subjects" value="${listSubject[i].id}"> ${listSubject[i].name}`
+                }
+                document.getElementById("list-subject").innerHTML = htmlSubject;
+            })
         })
     }
 
     function add() {
+        let inputSubjects = Array.from(document.getElementsByName("subjects"));
+        let subjects = [];
+        for (let i = 0; i < inputSubjects.length; i++) {
+            if (inputSubjects[i] && inputSubjects[i].checked) {
+                subjects.push(
+                    {
+                        id: inputSubjects[i].value
+                    }
+                )
+            }
+        }
         let name = document.getElementById("name").value;
         let age = document.getElementById("age").value;
         let email = document.getElementById("email").value;
@@ -91,8 +119,10 @@
             email: email,
             classRoom: {
                 id: idClass
-            }
+            },
+            subjects: subjects
         }
+        console.log(newStudent);
         axios.post('http://localhost:8080/students', newStudent).then(() => {
             showHome();
         })

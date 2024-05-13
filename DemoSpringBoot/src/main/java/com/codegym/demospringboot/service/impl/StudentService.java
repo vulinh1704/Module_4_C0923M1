@@ -1,18 +1,22 @@
 package com.codegym.demospringboot.service.impl;
 
 import com.codegym.demospringboot.model.Student;
+import com.codegym.demospringboot.model.Subject;
 import com.codegym.demospringboot.repository.StudentRepository;
+import com.codegym.demospringboot.repository.SubjectRepository;
 import com.codegym.demospringboot.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StudentService implements IStudentService {
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     @Override
     public List<Student> findAll() {
@@ -27,6 +31,18 @@ public class StudentService implements IStudentService {
 
     @Override
     public void save(Student student) {
+        // Lấy danh sách các môn học có trong Db;
+        Set<Subject> subjectList = student.getSubjects();
+        if (!subjectList.isEmpty()) {
+            Set<Subject> managedSubject = new HashSet<>();
+            for (Subject subject : subjectList) {
+                if (subject.getId() != null) {
+                    Optional<Subject> s = subjectRepository.findById(subject.getId());
+                    managedSubject.add(s.get());
+                }
+            }
+            student.setSubjects(managedSubject);
+        }
         studentRepository.save(student);
     }
 
