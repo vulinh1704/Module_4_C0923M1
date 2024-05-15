@@ -6,6 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
             integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
 </head>
 <body>
 <button onclick="showHome()">Home</button>
@@ -13,6 +14,20 @@
 <button onclick="showFormAdd()">Add</button>
 <div id="root">
 </div>
+
+<script>
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyCd8eX3J-IkDgBxVSNtSnuvMXOX_8qVD3Y",
+        authDomain: "demofirebase-ba87a.firebaseapp.com",
+        projectId: "demofirebase-ba87a",
+        storageBucket: "demofirebase-ba87a.appspot.com",
+        messagingSenderId: "576665638991",
+        appId: "1:576665638991:web:53901b98a374e89fcd323a",
+        measurementId: "G-VHYP37RSN3"
+    };
+    firebase.initializeApp(firebaseConfig);
+</script>
 
 <script>
     showHome();
@@ -28,6 +43,7 @@
                     <td>Age</td>
                     <td>Score</td>
                     <td>Email</td>
+                    <td>Image</td>
                     <td>Class</td>
                     <td>Subject</td>
                     <td colspan="2">Action</td>
@@ -41,6 +57,7 @@
                     <td>${list[i].age}</td>
                     <td>${list[i].score}</td>
                     <td>${list[i].email}</td>
+                    <td><img src="${list[i].image}" alt=""></td>
                     <td>${list[i].classRoom.name}</td>
                     <td>`
                 for (let j = 0; j < list[i].subjects.length; j++) {
@@ -81,6 +98,8 @@
             <input type="text" id="score" placeholder="Score">
             ${html}
             <div id="list-subject"></div>
+            <input type="file" onchange="uploadImage(event)">
+            <img src="" alt="" id="image">
             <button onclick="add()">Submit</button>
         `
             axios.get("http://localhost:8080/subjects").then((response) => {
@@ -92,6 +111,34 @@
                 document.getElementById("list-subject").innerHTML = htmlSubject;
             })
         })
+    }
+
+    function uploadImage(e) {
+        let fbBucketName = 'images';
+        let file = e.target.files[0];
+        let storageRef = firebase.storage().ref(`${fbBucketName}/${file.name}`);
+        let uploadTask = storageRef.put(file);
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+            function (snapshot) {
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED:
+                        break;
+                    case firebase.storage.TaskState.RUNNING:
+                        break;
+                }
+            }, function (error) {
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        break;
+                    case 'storage/canceled':
+                        break;
+                    case 'storage/unknown':
+                        break;
+                }
+            }, function () {
+                let downloadURL = uploadTask.snapshot.downloadURL;
+                document.getElementById("image").src = downloadURL;
+            });
     }
 
     function add() {
@@ -111,12 +158,14 @@
         let email = document.getElementById("email").value;
         let score = document.getElementById("score").value;
         let idClass = document.getElementById("class").value;
+        let image = document.getElementById("image").src;
 
         let newStudent = {
             name: name,
             age: age,
             score: score,
             email: email,
+            image: image,
             classRoom: {
                 id: idClass
             },

@@ -20,7 +20,8 @@ public class StudentService implements IStudentService {
 
     @Override
     public List<Student> findAll() {
-        return studentRepository.findAll();
+        String status = "ACTIVE";
+        return studentRepository.findAllByStatus(status);
     }
 
     @Override
@@ -48,7 +49,9 @@ public class StudentService implements IStudentService {
 
     @Override
     public void remove(Long id) {
-        studentRepository.deleteById(id);
+        Student student = studentRepository.findById(id).get();
+        student.setStatus("DELETED");
+        studentRepository.save(student);
     }
 
     @Override

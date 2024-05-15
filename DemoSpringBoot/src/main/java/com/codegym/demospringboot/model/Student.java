@@ -17,6 +17,8 @@ public class Student {
     private Integer age;
     private double score;
     private String email;
+    private String status = "ACTIVE";
+    private String image;
 
     @ManyToOne
     private ClassRoom classRoom;
